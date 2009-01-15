@@ -6,13 +6,19 @@
 	<property name="classfiles" value="bin"/>
 	<property name="lib" value="lib"/>
 	<property name="build_only_libs_folder" value="${lib}/build"/>
-	
 	<property name="jarfile" value="synchtool.jar"/>
+	
+    <path id="classpath">
+        <fileset dir="${lib}">
+            <include name="*.jar"/>
+        	<include name="build/*.jar"/>
+        </fileset>
+    </path>
 	
 	<target name="compile">
 		<mkdir dir="${classfiles}"/>
 	    <javac srcdir="${src}" destdir="${classfiles}">
-	        <classpath refid="project.classpath"/>
+	        <classpath refid="classpath"/>
 	    </javac>
 	</target>
 	
