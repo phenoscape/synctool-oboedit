@@ -10,6 +10,7 @@
 	<property name="jarfile" value="synchtool.jar"/>
 	
 	<target name="compile">
+		<mkdir dir="${classfiles}"/>
 	    <javac srcdir="${src}" destdir="${classfiles}">
 	        <classpath refid="project.classpath"/>
 	    </javac>
