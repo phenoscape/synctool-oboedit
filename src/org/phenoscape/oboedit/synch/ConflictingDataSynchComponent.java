@@ -24,7 +24,6 @@ import org.obo.datamodel.Dbxref;
 import org.obo.datamodel.OBOClass;
 import org.obo.history.DefinitionChangeHistoryItem;
 import org.obo.history.NameChangeHistoryItem;
-import org.obo.history.OperationModel;
 import org.oboedit.controller.SessionManager;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -149,9 +148,8 @@ public class ConflictingDataSynchComponent extends AbstractSynchComponent {
     }
 
     private void copyAllData(OBOClass from, OBOClass to) {
-        final OperationModel om = SessionManager.getManager().getSession().getOperationModel();
-        om.apply(new NameChangeHistoryItem(to, from.getName()));
-        om.apply(new DefinitionChangeHistoryItem(to, from.getDefinition()));
+        SessionManager.getManager().apply(new NameChangeHistoryItem(to, from.getName()));
+        SessionManager.getManager().apply(new DefinitionChangeHistoryItem(to, from.getDefinition()));
     }
 
     private boolean termsAreEquivalent(OBOClass term1, OBOClass term2) {

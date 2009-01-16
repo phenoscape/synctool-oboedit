@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
 
-<project name="synchronization tool" default="compile" basedir=".">
+<project name="synchronization tool" default="jar" basedir=".">
 	<description>synchronization tool ant build</description>
 	<property name="src" value="src"/>
 	<property name="classfiles" value="bin"/>
 	<property name="lib" value="lib"/>
-	<property name="build_only_libs_folder" value="${lib}/build"/>
 	<property name="jarfile" value="synchtool.jar"/>
 	
     <path id="classpath">

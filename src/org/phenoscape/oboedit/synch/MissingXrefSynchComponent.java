@@ -23,7 +23,6 @@ import org.obo.datamodel.Dbxref;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.impl.DbxrefImpl;
 import org.obo.history.AddDbxrefHistoryItem;
-import org.obo.history.OperationModel;
 import org.oboedit.controller.SessionManager;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -32,7 +31,7 @@ import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 
-public class MissingXrefSynchComponent extends AbstractSynchComponent{
+public class MissingXrefSynchComponent extends AbstractSynchComponent {
     
     private static final String EXPLANATORY_TEXT = "<HTML>These terms have the same name, "
         + "but there is no Xref in the term from the referring namespace to the term "
@@ -132,8 +131,7 @@ public class MissingXrefSynchComponent extends AbstractSynchComponent{
     }
 
     private void addXref(TermPair pair) {
-        final OperationModel om = SessionManager.getManager().getSession().getOperationModel();
-        om.apply(new AddDbxrefHistoryItem(pair.getReferrer().getID(), this.makeDbxref(pair.getMaster().getID()), false, null));
+        SessionManager.getManager().apply(new AddDbxrefHistoryItem(pair.getReferrer().getID(), this.makeDbxref(pair.getMaster().getID()), false, null));
     }
     
     private Dbxref makeDbxref(String oboid) {

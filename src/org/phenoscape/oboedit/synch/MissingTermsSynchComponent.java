@@ -12,15 +12,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.obo.datamodel.Dbxref;
 import org.obo.datamodel.OBOClass;
+import org.oboedit.controller.SelectionManager;
 import org.oboedit.controller.SessionManager;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.gui.TableFormat;
+import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 
 
@@ -39,11 +43,13 @@ public class MissingTermsSynchComponent extends AbstractSynchComponent {
             return 0;
         }
     });
+    private final EventSelectionModel<OBOClass> missingFromMasterSelectionModel = new EventSelectionModel<OBOClass>(this.termsMissingFromMaster);
     private final EventList<OBOClass> termsMissingFromReferring = new SortedList<OBOClass>(new BasicEventList<OBOClass>(), new Comparator<OBOClass>() {
         public int compare(OBOClass o1, OBOClass o2) {
             return 0;
         }
     });
+    private final EventSelectionModel<OBOClass> missingFromReferringSelectionModel = new EventSelectionModel<OBOClass>(this.termsMissingFromReferring);
     
     public MissingTermsSynchComponent() {
         this.initializeInterface();
@@ -67,16 +73,31 @@ public class MissingTermsSynchComponent extends AbstractSynchComponent {
         final JTabbedPane tabPane = new JTabbedPane();
         this.getComponent().add(tabPane, BorderLayout.CENTER);
         final JTable missingFromMasterTable = new JTable(new EventTableModel<OBOClass>(this.termsMissingFromMaster, new TermTableFormat()));
+        missingFromMasterTable.setSelectionModel(this.missingFromMasterSelectionModel);
         final JPanel missingFromMasterPanel = new JPanel(new BorderLayout());
         missingFromMasterPanel.add(new JScrollPane(missingFromMasterTable), BorderLayout.CENTER);
         missingFromMasterPanel.add(new JLabel(MISSING_FROM_MASTER_EXPLANATORY_TEXT), BorderLayout.NORTH);
         tabPane.addTab("Missing From Master", missingFromMasterPanel);
         
         final JTable missingFromReferringTable = new JTable(new EventTableModel<OBOClass>(this.termsMissingFromReferring, new TermTableFormat()));
+        missingFromReferringTable.setSelectionModel(this.missingFromReferringSelectionModel);
         final JPanel missingFromReferringPanel = new JPanel(new BorderLayout());
         missingFromReferringPanel.add(new JScrollPane(missingFromReferringTable), BorderLayout.CENTER);
         missingFromReferringPanel.add(new JLabel(MISSING_FROM_REFERRING_EXPLANATORY_TEXT), BorderLayout.NORTH);
         tabPane.addTab("Missing From Referring", missingFromReferringPanel);
+        
+        final ListSelectionListener selectionListener = new ListSelectionListener() {
+            @SuppressWarnings("unchecked")
+            public void valueChanged(ListSelectionEvent e) {
+                final EventSelectionModel<OBOClass> model = ((EventSelectionModel<OBOClass>)(e.getSource()));
+                if (!model.isSelectionEmpty()) {
+                    SelectionManager.selectTerm(getComponent(), model.getSelected().get(0));
+                }
+            }
+            
+        };
+        this.missingFromMasterSelectionModel.addListSelectionListener(selectionListener);
+        this.missingFromReferringSelectionModel.addListSelectionListener(selectionListener);
     }
     
     private Map<String,List<OBOClass>> getReferredToAndUnreferringTerms() {

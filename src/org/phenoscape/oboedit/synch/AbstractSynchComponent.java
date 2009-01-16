@@ -14,16 +14,9 @@ import org.oboedit.controller.SessionManager;
 
 public abstract class AbstractSynchComponent implements SynchComponent {
     
-    private static final String MASTER_NAMESPACE = "zebrafish_anatomy";
-    private static final String REFERRING_NAMESPACE = "teleost_anatomy";
     private Namespace masterNamespace;
     private Namespace referringNamespace;
     private final JComponent component = new JPanel();
-    
-    public AbstractSynchComponent() {
-        this.masterNamespace = SessionManager.getManager().getSession().getNamespace(MASTER_NAMESPACE);
-        this.referringNamespace = SessionManager.getManager().getSession().getNamespace(REFERRING_NAMESPACE);
-    }
     
     public void setMasterNamespace(Namespace namespace) {
         this.masterNamespace = namespace;
