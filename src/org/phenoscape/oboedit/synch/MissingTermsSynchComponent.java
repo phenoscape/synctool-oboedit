@@ -31,11 +31,11 @@ import ca.odell.glazedlists.swing.EventTableModel;
 public class MissingTermsSynchComponent extends AbstractSynchComponent {
     
     private static final String MISSING_FROM_MASTER_EXPLANATORY_TEXT = "<HTML>These are terms in the referring namespace "
-        + "that have no Xref to a term in the master namespace.  A subset of these may also be listed under the "
-        + "\"Missing Xrefs\" tab.</HTML>";
+        + "that have no Dbxref to a term in the master namespace.  A subset of these may also be listed under the "
+        + "\"Missing Dbxrefs\" tab.</HTML>";
     private static final String MISSING_FROM_REFERRING_EXPLANATORY_TEXT = "<HTML>These are terms in the master namespace "
-        + "that are not Xref'd from any term in the referring namespace.  A subset of these may also be listed under the "
-        + "\"Missing Xrefs\" tab.</HTML>";
+        + "that are not Dbxref'd from any term in the referring namespace.  A subset of these may also be listed under the "
+        + "\"Missing Dbxrefs\" tab.</HTML>";
     private static final String UNREFERRING = "unreferring";
     private static final String REFERRED_TO = "referredTo";
     private final EventList<OBOClass> termsMissingFromMaster = new SortedList<OBOClass>(new BasicEventList<OBOClass>(), new Comparator<OBOClass>() {

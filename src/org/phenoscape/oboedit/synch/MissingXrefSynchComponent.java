@@ -34,7 +34,7 @@ import ca.odell.glazedlists.swing.EventTableModel;
 public class MissingXrefSynchComponent extends AbstractSynchComponent {
     
     private static final String EXPLANATORY_TEXT = "<HTML>These terms have the same name, "
-        + "but there is no Xref in the term from the referring namespace to the term "
+        + "but there is no Dbxref in the term from the referring namespace to the term "
         + "in the master namespace.</HTML>";
     private final EventList<TermPair> termsNeedingXrefs = new SortedList<TermPair>(new BasicEventList<TermPair>(), new Comparator<TermPair>() {
         public int compare(TermPair o1, TermPair o2) {
@@ -56,7 +56,7 @@ public class MissingXrefSynchComponent extends AbstractSynchComponent {
     }
     
     public String getTitle() {
-        return "Missing Xrefs";
+        return "Missing Dbxrefs";
     }
     
     @SuppressWarnings("serial")
@@ -91,7 +91,7 @@ public class MissingXrefSynchComponent extends AbstractSynchComponent {
         splitPaneConstraints.weightx = 1.0;
         splitPaneConstraints.weighty = 1.0;
         this.getComponent().add(splitPane, splitPaneConstraints);
-        final JButton button = new JButton(new AbstractAction("Create Xref") {
+        final JButton button = new JButton(new AbstractAction("Create Dbxref") {
             public void actionPerformed(ActionEvent e) {
                 for (TermPair pair : xrefSelectionModel.getSelected()) {
                     addXref(pair);
