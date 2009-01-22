@@ -29,6 +29,8 @@ public class SynchronizationComponent extends AbstractGUIComponent {
     private JComboBox referringNamespaceChooser;
     private JTabbedPane tabPane;
     private final List<SynchComponent> subcomponents = new ArrayList<SynchComponent>();
+    private Namespace masterNamespace;
+    private Namespace referringNamespace;
 
     public SynchronizationComponent(String id) {
         super(id);
@@ -107,9 +109,9 @@ public class SynchronizationComponent extends AbstractGUIComponent {
     private void configureNamespaceChoosers() {
         final OBOSession session = SessionManager.getManager().getSession();
         this.masterNamespaceChooser.setModel(new DefaultComboBoxModel(session.getNamespaces().toArray()));
+        this.masterNamespaceChooser.setSelectedItem(this.masterNamespace);
         this.referringNamespaceChooser.setModel(new DefaultComboBoxModel(session.getNamespaces().toArray()));
-        this.setReferringNamespace((Namespace)(this.masterNamespaceChooser.getSelectedItem()));
-        this.setReferringNamespace((Namespace)(this.referringNamespaceChooser.getSelectedItem()));
+        this.referringNamespaceChooser.setSelectedItem(this.referringNamespace);
     }
     
     private void refreshSubcomponents() {
@@ -119,12 +121,14 @@ public class SynchronizationComponent extends AbstractGUIComponent {
     }
     
     private void setMasterNamespace(Namespace ns) {
+        this.masterNamespace = ns;
         for (SynchComponent component : this.subcomponents) {
             component.setMasterNamespace(ns);
         }
     }
     
    private void setReferringNamespace(Namespace ns) {
+       this.referringNamespace = ns;
        for (SynchComponent component : this.subcomponents) {
            component.setReferringNamespace(ns);
        }
