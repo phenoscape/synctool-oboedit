@@ -8,11 +8,11 @@ public interface SynchComponent {
     
     public JComponent getComponent();
     
-    public void setMasterNamespace(Namespace namespace);
+    public void setMasterNamespaceID(String namespace);
     
     public Namespace getMasterNamespace();
     
-    public void setReferringNamespace(Namespace namespace);
+    public void setReferringNamespaceID(String namespace);
     
     public Namespace getReferringNamespace();
     

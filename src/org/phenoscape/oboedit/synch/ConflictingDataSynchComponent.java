@@ -34,7 +34,7 @@ import ca.odell.glazedlists.swing.EventTableModel;
 
 public class ConflictingDataSynchComponent extends AbstractSynchComponent {
 
-    private static final String EXPLANATORY_TEXT = "<HTML>These terms have an Dbxref from a term in the referring namespace "
+    private static final String EXPLANATORY_TEXT = "<HTML>These terms have a Dbxref from a term in the referring namespace "
         + "to a term in the master namespace; however they differ in either their name or definition.</HTML>";
     private final EventList<TermPair> termsWithConflictingData = new SortedList<TermPair>(new BasicEventList<TermPair>(), new Comparator<TermPair>() {
         public int compare(TermPair o1, TermPair o2) {
@@ -51,6 +51,7 @@ public class ConflictingDataSynchComponent extends AbstractSynchComponent {
     }
 
     public void refreshView() {
+        log().debug("Refreshing view in ConflictingData component");
         this.termsWithConflictingData.clear();
         this.termsWithConflictingData.addAll(this.getXrefTermsWithConflictingData());
     }
