@@ -20,10 +20,14 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.obo.datamodel.Dbxref;
+import org.obo.datamodel.Link;
+import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.impl.DbxrefImpl;
 import org.obo.history.AddDbxrefHistoryItem;
 import org.oboedit.controller.SessionManager;
+import org.oboedit.gui.DefaultSelection;
+import org.oboedit.gui.components.TextEditor;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -43,8 +47,8 @@ public class MissingXrefSynchComponent extends AbstractSynchComponent {
     });
     private final EventSelectionModel<TermPair> xrefSelectionModel = new EventSelectionModel<TermPair>(this.termsNeedingXrefs);
     private JTable xrefsTable;
-    private TermInspector masterInspector;
-    private TermInspector referrerInspector;
+    private final TermSelector masterSelector = new TermSelector();
+    private final TermSelector referrerSelector = new TermSelector();
     
     public MissingXrefSynchComponent() {
         this.initializeInterface();
@@ -68,20 +72,23 @@ public class MissingXrefSynchComponent extends AbstractSynchComponent {
         labelConstraints.weightx = 1.0;
         this.getComponent().add(new JLabel(EXPLANATORY_TEXT), labelConstraints);
         this.xrefsTable = new JTable(new EventTableModel<TermPair>(this.termsNeedingXrefs, new TermPairTableFormat()));
-        this.xrefsTable.setSelectionModel(this.xrefSelectionModel);
-        this.masterInspector = new TermInspector();
-        this.masterInspector.setBorder(BorderFactory.createTitledBorder("Master"));
-        this.referrerInspector = new TermInspector();
-        this.referrerInspector.setBorder(BorderFactory.createTitledBorder("Referrer"));
+        this.xrefsTable.setSelectionModel(this.xrefSelectionModel);        
+        final TextEditor masterTextEditor = new TextEditor(null);
+        masterTextEditor.setBorder(BorderFactory.createTitledBorder("Master"));
+        masterTextEditor.setObjectSelector(this.masterSelector);
+        final TextEditor referrerTextEditor = new TextEditor(null);
+        referrerTextEditor.setBorder(BorderFactory.createTitledBorder("Referrer"));
+        referrerTextEditor.setObjectSelector(this.referrerSelector);
         final JPanel inspectorPanel = new JPanel(new GridBagLayout());
         final GridBagConstraints inspectorConstraints = new GridBagConstraints();
         inspectorConstraints.gridx = 0;
         inspectorConstraints.weightx = 1.0;
         inspectorConstraints.weighty = 1.0;
         inspectorConstraints.fill = GridBagConstraints.BOTH;
-        inspectorPanel.add(this.masterInspector, inspectorConstraints);
+        inspectorPanel.add(masterTextEditor, inspectorConstraints);
+        inspectorPanel.add(masterTextEditor, inspectorConstraints);
         inspectorConstraints.gridx = 1;
-        inspectorPanel.add(this.referrerInspector, inspectorConstraints);
+        inspectorPanel.add(referrerTextEditor, inspectorConstraints);
         final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(this.xrefsTable), inspectorPanel);
         splitPane.setDividerLocation(0.5);
         splitPane.setContinuousLayout(true);
@@ -105,14 +112,21 @@ public class MissingXrefSynchComponent extends AbstractSynchComponent {
         this.getComponent().add(button, buttonConstraints);
         this.xrefSelectionModel.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
+                final LinkedObject masterTerm;
+                final LinkedObject referringTerm;
                 if (!xrefSelectionModel.isSelectionEmpty() && !(xrefSelectionModel.getSelected().size() > 1)) {
-                    masterInspector.setTerm(xrefSelectionModel.getSelected().get(0).getMaster());
-                    referrerInspector.setTerm(xrefSelectionModel.getSelected().get(0).getReferrer());
+                    masterTerm = xrefSelectionModel.getSelected().get(0).getMaster();
+                    referringTerm = xrefSelectionModel.getSelected().get(0).getReferrer();                    
                 } else {
-                    masterInspector.setTerm(null);
-                    referrerInspector.setTerm(null);
+                    masterTerm = null;
+                    referringTerm = null;
                 }
- 
+                final List<LinkedObject> masterTerms = new ArrayList<LinkedObject>();
+                masterTerms.add(masterTerm);
+                masterSelector.select(new DefaultSelection(getComponent(), new ArrayList<Link>(), masterTerms, null, null, null, null, null, null));
+                final List<LinkedObject> referrerTerms = new ArrayList<LinkedObject>();
+                referrerTerms.add(referringTerm);
+                referrerSelector.select(new DefaultSelection(getComponent(), new ArrayList<Link>(), referrerTerms, null, null, null, null, null, null));
             }
         });
     }

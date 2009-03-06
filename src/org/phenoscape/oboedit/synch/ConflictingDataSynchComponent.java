@@ -21,10 +21,14 @@ import javax.swing.event.ListSelectionListener;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.obo.datamodel.Dbxref;
+import org.obo.datamodel.Link;
+import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.history.DefinitionChangeHistoryItem;
 import org.obo.history.NameChangeHistoryItem;
 import org.oboedit.controller.SessionManager;
+import org.oboedit.gui.DefaultSelection;
+import org.oboedit.gui.components.TextEditor;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -35,7 +39,7 @@ import ca.odell.glazedlists.swing.EventTableModel;
 public class ConflictingDataSynchComponent extends AbstractSynchComponent {
 
     private static final String EXPLANATORY_TEXT = "<HTML>These terms have a Dbxref from a term in the referring namespace "
-        + "to a term in the master namespace; however they differ in either their name or definition.</HTML>";
+        + "to a term in the master namespace; however they differ in their name, definition, definition Dbxrefs, comment, or synonyms.</HTML>";
     private final EventList<TermPair> termsWithConflictingData = new SortedList<TermPair>(new BasicEventList<TermPair>(), new Comparator<TermPair>() {
         public int compare(TermPair o1, TermPair o2) {
             return 0;
@@ -43,8 +47,8 @@ public class ConflictingDataSynchComponent extends AbstractSynchComponent {
     });
     private final EventSelectionModel<TermPair> conflictsSelectionModel = new EventSelectionModel<TermPair>(this.termsWithConflictingData);
     private JTable xrefsTable;
-    private TermInspector masterInspector;
-    private TermInspector referrerInspector;
+    private final TermSelector masterSelector = new TermSelector();
+    private final TermSelector referrerSelector = new TermSelector();
 
     public ConflictingDataSynchComponent() {
         this.initializeInterface();
@@ -72,19 +76,22 @@ public class ConflictingDataSynchComponent extends AbstractSynchComponent {
         this.getComponent().add(new JLabel(EXPLANATORY_TEXT), labelConstraints);
         this.xrefsTable = new JTable(new EventTableModel<TermPair>(this.termsWithConflictingData, new TermPairTableFormat()));
         this.xrefsTable.setSelectionModel(this.conflictsSelectionModel);
-        this.masterInspector = new TermInspector();
-        this.masterInspector.setBorder(BorderFactory.createTitledBorder("Master"));
-        this.referrerInspector = new TermInspector();
-        this.referrerInspector.setBorder(BorderFactory.createTitledBorder("Referrer"));
+        final TextEditor masterTextEditor = new TextEditor(null);
+        masterTextEditor.setBorder(BorderFactory.createTitledBorder("Master"));
+        masterTextEditor.setObjectSelector(this.masterSelector);
+        final TextEditor referrerTextEditor = new TextEditor(null);
+        referrerTextEditor.setBorder(BorderFactory.createTitledBorder("Referrer"));
+        referrerTextEditor.setObjectSelector(this.referrerSelector);
+      
         final JPanel inspectorPanel = new JPanel(new GridBagLayout());
         final GridBagConstraints inspectorConstraints = new GridBagConstraints();
         inspectorConstraints.gridx = 0;
         inspectorConstraints.weightx = 1.0;
         inspectorConstraints.weighty = 1.0;
         inspectorConstraints.fill = GridBagConstraints.BOTH;
-        inspectorPanel.add(this.masterInspector, inspectorConstraints);
+        inspectorPanel.add(masterTextEditor, inspectorConstraints);
         inspectorConstraints.gridx = 1;
-        inspectorPanel.add(this.referrerInspector, inspectorConstraints);
+        inspectorPanel.add(referrerTextEditor, inspectorConstraints);
         final GridBagConstraints splitPaneConstraints = new GridBagConstraints();
         splitPaneConstraints.fill = GridBagConstraints.BOTH;
         splitPaneConstraints.weighty = 1.0;
@@ -121,13 +128,21 @@ public class ConflictingDataSynchComponent extends AbstractSynchComponent {
         this.getComponent().add(copyFromReferrer, buttonConstraints);
         this.conflictsSelectionModel.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
+                final LinkedObject masterTerm;
+                final LinkedObject referringTerm;
                 if (!conflictsSelectionModel.isSelectionEmpty() && !(conflictsSelectionModel.getSelected().size() > 1)) {
-                    masterInspector.setTerm(conflictsSelectionModel.getSelected().get(0).getMaster());
-                    referrerInspector.setTerm(conflictsSelectionModel.getSelected().get(0).getReferrer());
+                    masterTerm = conflictsSelectionModel.getSelected().get(0).getMaster();
+                    referringTerm = conflictsSelectionModel.getSelected().get(0).getReferrer();                    
                 } else {
-                    masterInspector.setTerm(null);
-                    referrerInspector.setTerm(null);
+                    masterTerm = null;
+                    referringTerm = null;
                 }
+                final List<LinkedObject> masterTerms = new ArrayList<LinkedObject>();
+                masterTerms.add(masterTerm);
+                masterSelector.select(new DefaultSelection(getComponent(), new ArrayList<Link>(), masterTerms, null, null, null, null, null, null));
+                final List<LinkedObject> referrerTerms = new ArrayList<LinkedObject>();
+                referrerTerms.add(referringTerm);
+                referrerSelector.select(new DefaultSelection(getComponent(), new ArrayList<Link>(), referrerTerms, null, null, null, null, null, null));
             }
         });
     }
@@ -158,6 +173,15 @@ public class ConflictingDataSynchComponent extends AbstractSynchComponent {
             return false;
         }
         if (!ObjectUtils.equals(term1.getDefinition(), term2.getDefinition())) {
+            return false;
+        }
+        if (!ObjectUtils.equals(term1.getComment(), term2.getComment())) {
+            return false;
+        }
+        if (!ObjectUtils.equals(term1.getDefDbxrefs(), term2.getDefDbxrefs())) {
+            return false;
+        }
+        if (!ObjectUtils.equals(term1.getSynonyms(), term2.getSynonyms())) {
             return false;
         }
         return true;
