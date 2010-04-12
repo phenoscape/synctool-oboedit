@@ -43,7 +43,7 @@ public class SynchronizationComponentConfigPanel extends ConfigurationPanel {
 
     @Override
     public void init() {
-        this.settings = (SynchronizationComponentSettings)(((SynchronizationComponent)(this.getComponent())).getConfiguration());
+        this.settings = (SynchronizationComponentSettings)(((SynchronizationComponent)(this.getComponent())).getSettings());
         this.masterNamespaceChooser.setModel(new DefaultComboBoxModel(this.getSession().getNamespaces().toArray()));
         this.referringNamespaceChooser.setModel(new DefaultComboBoxModel(this.getSession().getNamespaces().toArray()));
         this.masterNamespaceChooser.setSelectedItem(this.getSession().getNamespace(this.settings.getMasterNamespace()));
@@ -54,7 +54,7 @@ public class SynchronizationComponentConfigPanel extends ConfigurationPanel {
     public void commit() {
         this.setMasterNamespace((Namespace)(this.masterNamespaceChooser.getSelectedItem()));
         this.setReferringNamespace((Namespace)(this.referringNamespaceChooser.getSelectedItem()));
-        ((SynchronizationComponent)(this.getComponent())).setConfiguration(this.settings); 
+        ((SynchronizationComponent)(this.getComponent())).setSettings(this.settings);
     }
 
     private void setMasterNamespace(Namespace ns) {

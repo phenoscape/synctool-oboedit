@@ -40,20 +40,27 @@ public class SynchronizationComponent extends AbstractGUIComponent {
             }
         });
     }
-    
+
     @Override
     public ConfigurationPanel getConfigurationPanel() {
         return new SynchronizationComponentConfigPanel();
     }
 
-    @Override
-    public ComponentConfiguration getConfiguration() {
+    /**
+     * This has been changed from getConfiguration to getSettings to avoid OBO-Edit trying to 
+     * save the configuration. This works around a classloading problem with OBO-Edit plugin configurations. 
+     */
+    public ComponentConfiguration getSettings() {
+        //TODO get settings using Java Preferences API
         return this.settings;
     }
 
-    @Override
-    public void setConfiguration(ComponentConfiguration config) {
-        log().debug("Set configuration: " + config);
+    /**
+     * This has been changed from setConfiguration to setSettings to avoid OBO-Edit trying to 
+     * save the configuration. This works around a classloading problem with OBO-Edit plugin configurations.
+     */
+    public void setSettings(ComponentConfiguration config) {
+        //TODO save settings using Java Preferences API
         if ((config != null) && (config instanceof SynchronizationComponentSettings)) {
             this.settings = (SynchronizationComponentSettings)config;
         }
@@ -70,7 +77,7 @@ public class SynchronizationComponent extends AbstractGUIComponent {
         }
         this.tabPane.addTab("Structural Differences", new JLabel("Not yet implemented."));
     }
-    
+
     private void applyNamespacesToSubcomponents() {
         for (SynchComponent component : this.subcomponents) {
             log().debug("Setting namespace for: " + component);
