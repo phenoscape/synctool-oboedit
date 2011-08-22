@@ -134,8 +134,8 @@ public class MissingXrefSynchComponent extends AbstractSynchComponent {
     
     private List<TermPair> getMatchingTermNamesWithoutXrefs() {
         final List<TermPair> terms = new ArrayList<TermPair>();
-        final Collection<OBOClass> referringTerms = this.getReferringTerms();
-        for (OBOClass master : this.getMasterTerms()) {
+        final Collection<OBOClass> referringTerms = this.getReferringTerms(false);
+        for (OBOClass master : this.getMasterTerms(false)) {
             final OBOClass match = this.findTerm(master.getName(), referringTerms);
             if (match == null) continue;
             if (!this.doesTermReferenceTerm(match, master)) {

@@ -62,7 +62,7 @@ public class MissingTermsSynchComponent extends AbstractSynchComponent {
     public void refreshView() {
         final Map<String,List<OBOClass>> map = this.getReferredToAndUnreferringTerms();
         this.termsMissingFromReferring.clear();
-        this.termsMissingFromReferring.addAll(this.getMasterTerms());
+        this.termsMissingFromReferring.addAll(this.getMasterTerms(false));
         this.termsMissingFromReferring.removeAll(map.get(REFERRED_TO));
         this.termsMissingFromMaster.clear();
         this.termsMissingFromMaster.addAll(map.get(UNREFERRING));
@@ -103,7 +103,7 @@ public class MissingTermsSynchComponent extends AbstractSynchComponent {
     private Map<String,List<OBOClass>> getReferredToAndUnreferringTerms() {
         final List<OBOClass> referredToTerms = new ArrayList<OBOClass>();
         final List<OBOClass> unreferringTerms = new ArrayList<OBOClass>();
-        for (OBOClass referrer : this.getReferringTerms()) {
+        for (OBOClass referrer : this.getReferringTerms(false)) {
             boolean foundXref = false;
             for (Dbxref xref : referrer.getDbxrefs()) {
                 final OBOClass candidate = (OBOClass)(SessionManager.getManager().getSession().getObject(this.makeOBOID(xref))); 

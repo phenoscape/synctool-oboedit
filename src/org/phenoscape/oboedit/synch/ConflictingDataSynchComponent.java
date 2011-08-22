@@ -152,8 +152,8 @@ public class ConflictingDataSynchComponent extends AbstractSynchComponent {
 
     private List<TermPair> getXrefTermsWithConflictingData() {
         final List<TermPair> terms = new ArrayList<TermPair>();
-        final Collection<OBOClass> masterTerms = this.getMasterTerms();
-        for (OBOClass referrer : this.getReferringTerms()) {
+        final Collection<OBOClass> masterTerms = this.getMasterTerms(false);
+        for (OBOClass referrer : this.getReferringTerms(false)) {
             for (Dbxref xref : referrer.getDbxrefs()) {
                 final OBOClass masterCandidate = (OBOClass)(SessionManager.getManager().getSession().getObject(this.makeOBOID(xref)));
                 if (masterTerms.contains(masterCandidate)) {

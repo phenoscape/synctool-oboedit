@@ -43,20 +43,22 @@ public abstract class AbstractSynchComponent implements SynchComponent {
         return this.getSession().getNamespace(this.referringNamespace);
     }
 
-    protected Collection<OBOClass> getMasterTerms() {
+    protected Collection<OBOClass> getMasterTerms(boolean includeObsoletes) {
         if (this.getMasterNamespace() != null) {
             final QueryEngine engine = new QueryEngine(this.getSession());
             final NamespaceQuery masterQuery = new NamespaceQuery(this.getMasterNamespace());
+            masterQuery.setAllowObsoletes(includeObsoletes);
             return engine.query(masterQuery);
         } else {
             return Collections.emptyList();
         }
     }
     
-    protected Collection<OBOClass> getReferringTerms() {
+    protected Collection<OBOClass> getReferringTerms(boolean includeObsoletes) {
         if (this.getReferringNamespace() != null) {
             final QueryEngine engine = new QueryEngine(this.getSession());
             final NamespaceQuery referringQuery = new NamespaceQuery(this.getReferringNamespace());
+            referringQuery.setAllowObsoletes(includeObsoletes);
             return engine.query(referringQuery);
         } else {
             return Collections.emptyList();
