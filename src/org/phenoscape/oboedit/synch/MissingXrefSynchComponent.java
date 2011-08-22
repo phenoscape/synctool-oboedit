@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -73,10 +74,10 @@ public class MissingXrefSynchComponent extends AbstractSynchComponent {
         this.getComponent().add(new JLabel(EXPLANATORY_TEXT), labelConstraints);
         this.xrefsTable = new JTable(new EventTableModel<TermPair>(this.termsNeedingXrefs, new TermPairTableFormat()));
         this.xrefsTable.setSelectionModel(this.xrefSelectionModel);        
-        final TextEditor masterTextEditor = new TextEditor(null);
+        final TextEditor masterTextEditor = new TextEditor(UUID.randomUUID().toString());
         masterTextEditor.setBorder(BorderFactory.createTitledBorder("Master"));
         masterTextEditor.setObjectSelector(this.masterSelector);
-        final TextEditor referrerTextEditor = new TextEditor(null);
+        final TextEditor referrerTextEditor = new TextEditor(UUID.randomUUID().toString());
         referrerTextEditor.setBorder(BorderFactory.createTitledBorder("Referrer"));
         referrerTextEditor.setObjectSelector(this.referrerSelector);
         final JPanel inspectorPanel = new JPanel(new GridBagLayout());
@@ -86,7 +87,7 @@ public class MissingXrefSynchComponent extends AbstractSynchComponent {
         inspectorConstraints.weighty = 1.0;
         inspectorConstraints.fill = GridBagConstraints.BOTH;
         inspectorPanel.add(masterTextEditor, inspectorConstraints);
-        inspectorPanel.add(masterTextEditor, inspectorConstraints);
+//        //inspectorPanel.add(masterTextEditor, inspectorConstraints);
         inspectorConstraints.gridx = 1;
         inspectorPanel.add(referrerTextEditor, inspectorConstraints);
         final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(this.xrefsTable), inspectorPanel);
@@ -123,10 +124,10 @@ public class MissingXrefSynchComponent extends AbstractSynchComponent {
                 }
                 final List<LinkedObject> masterTerms = new ArrayList<LinkedObject>();
                 masterTerms.add(masterTerm);
-                masterSelector.select(new DefaultSelection(getComponent(), new ArrayList<Link>(), masterTerms, null, null, null, null, null, null));
+                masterSelector.select(new DefaultSelection(getComponent(), new ArrayList<Link>(), masterTerms, null, null, null, null, null, masterTerm));
                 final List<LinkedObject> referrerTerms = new ArrayList<LinkedObject>();
                 referrerTerms.add(referringTerm);
-                referrerSelector.select(new DefaultSelection(getComponent(), new ArrayList<Link>(), referrerTerms, null, null, null, null, null, null));
+                referrerSelector.select(new DefaultSelection(getComponent(), new ArrayList<Link>(), referrerTerms, null, null, null, null, null, referringTerm));
             }
         });
     }
