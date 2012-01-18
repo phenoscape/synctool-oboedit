@@ -2,10 +2,16 @@ package org.phenoscape.oboedit.synch;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.io.File;
 
+import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 import org.bbop.framework.ConfigurationPanel;
 import org.obo.datamodel.Namespace;
@@ -18,18 +24,22 @@ public class SynchronizationComponentConfigPanel extends ConfigurationPanel {
     private SynchronizationComponentSettings settings = new SynchronizationComponentSettings();
     private JComboBox masterNamespaceChooser;
     private JComboBox referringNamespaceChooser;
+    private JTextField excludedTermsField;
+    private File excludedTermsFile;
 
     public SynchronizationComponentConfigPanel() {
         super();
         this.setLayout(new GridBagLayout());
         this.masterNamespaceChooser = new JComboBox();
         this.referringNamespaceChooser = new JComboBox();
+        this.excludedTermsField = new JTextField();
         final GridBagConstraints labelConstraints = new GridBagConstraints();
         labelConstraints.gridx = 0;
         labelConstraints.gridy = 0;
         labelConstraints.anchor = GridBagConstraints.EAST;
         final GridBagConstraints popupConstraints = new GridBagConstraints();
         popupConstraints.gridx = 1;
+        popupConstraints.gridwidth = 2;
         popupConstraints.gridy = 0;
         popupConstraints.fill = GridBagConstraints.HORIZONTAL;
         popupConstraints.weightx = 1.0;
@@ -39,6 +49,28 @@ public class SynchronizationComponentConfigPanel extends ConfigurationPanel {
         popupConstraints.gridy = 1;
         this.add(new JLabel("Referring Namespace:"), labelConstraints);
         this.add(this.referringNamespaceChooser, popupConstraints);
+        labelConstraints.gridy = 2;
+        this.add(new JLabel("Excluded terms file:"), labelConstraints);
+        this.excludedTermsField.setEditable(false);
+        popupConstraints.gridy = 2;
+        popupConstraints.gridwidth = 1;
+        this.add(this.excludedTermsField, popupConstraints);
+        final GridBagConstraints buttonConstraints = new GridBagConstraints();
+        buttonConstraints.gridy = 2;
+        buttonConstraints.gridx = 2;
+        final JButton chooseButton = new JButton(new AbstractAction("Choose...") {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                final JFileChooser chooser = new JFileChooser();
+                final int result = chooser.showOpenDialog(SynchronizationComponentConfigPanel.this);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    excludedTermsFile = chooser.getSelectedFile();
+                    excludedTermsField.setText(excludedTermsFile.getAbsolutePath());
+                    settings.setExcludedTermsFile(excludedTermsFile);
+                }
+            }
+        });
+        this.add(chooseButton, buttonConstraints);
     }
 
     @Override

@@ -1,7 +1,10 @@
 package org.phenoscape.oboedit.synch;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -19,28 +22,55 @@ public abstract class AbstractSynchComponent implements SynchComponent {
     
     private String masterNamespace;
     private String referringNamespace;
+    private List<OBOClass> ignoredTerms = new ArrayList<OBOClass>();
+    private File ignoredTermsFile;
     private final JComponent component = new JPanel();
     
+    @Override
     public void setMasterNamespaceID(String namespace) {
         log().debug("Setting master namespace: " + namespace);
         this.masterNamespace = namespace;
     }
     
+    @Override
     public Namespace getMasterNamespace() {
         log().debug("Getting master namespace: " + this.getSession().getNamespace(this.masterNamespace) + " using: " + this.masterNamespace);
         return this.getSession().getNamespace(this.masterNamespace);
     }
 
+    @Override
     public JComponent getComponent() {
         return this.component;
     }
 
+    @Override
     public void setReferringNamespaceID(String namespace) {
         this.referringNamespace = namespace;
     }
     
+    @Override
     public Namespace getReferringNamespace() {
         return this.getSession().getNamespace(this.referringNamespace);
+    }
+    
+    @Override
+    public void setIgnoredTerms(List<OBOClass> terms) {
+        this.ignoredTerms = terms;
+    }
+    
+    @Override
+    public List<OBOClass> getIgnoredTerms() {
+        return this.ignoredTerms;
+    }
+    
+    @Override
+    public void setIgnoredTermsFile(File file) {
+        this.ignoredTermsFile = file;
+    }
+    
+    @Override
+    public File getIgnoredTermsFile() {
+        return this.ignoredTermsFile;
     }
 
     protected Collection<OBOClass> getMasterTerms(boolean includeObsoletes) {

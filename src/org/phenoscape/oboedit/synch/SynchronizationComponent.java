@@ -1,16 +1,22 @@
 package org.phenoscape.oboedit.synch;
 
 import java.awt.BorderLayout;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 
 import org.apache.log4j.Logger;
 import org.bbop.framework.AbstractGUIComponent;
 import org.bbop.framework.ComponentConfiguration;
 import org.bbop.framework.ConfigurationPanel;
+import org.obo.datamodel.OBOClass;
+import org.oboedit.controller.SessionManager;
 import org.oboedit.gui.event.ReloadEvent;
 import org.oboedit.gui.event.ReloadListener;
 import org.oboedit.util.GUIUtil;
@@ -21,6 +27,8 @@ public class SynchronizationComponent extends AbstractGUIComponent {
     private JTabbedPane tabPane;
     private final List<SynchComponent> subcomponents = new ArrayList<SynchComponent>();
     private SynchronizationComponentSettings settings = new SynchronizationComponentSettings();
+    private File excludedTermsFile = null;
+    private final List<OBOClass> excludedTerms = new ArrayList<OBOClass>();
 
     public SynchronizationComponent(String id) {
         super(id);
@@ -35,6 +43,7 @@ public class SynchronizationComponent extends AbstractGUIComponent {
         this.applyNamespacesToSubcomponents();
         this.initializeInterface();
         GUIUtil.addReloadListener(new ReloadListener() {
+            @Override
             public void reload(ReloadEvent arg0) {
                 refreshSubcomponents();
             }
@@ -64,6 +73,8 @@ public class SynchronizationComponent extends AbstractGUIComponent {
         if ((config != null) && (config instanceof SynchronizationComponentSettings)) {
             this.settings = (SynchronizationComponentSettings)config;
         }
+        this.excludedTermsFile = this.settings.getExcludedTermsFile();
+        this.loadExcludedTerms();
         this.applyNamespacesToSubcomponents();
         this.refreshSubcomponents();
     }
@@ -75,7 +86,7 @@ public class SynchronizationComponent extends AbstractGUIComponent {
         for (SynchComponent component : this.subcomponents) {
             this.tabPane.addTab(component.getTitle(), component.getComponent());
         }
-        this.tabPane.addTab("Structural Differences", new JLabel("Not yet implemented."));
+        //this.tabPane.addTab("Structural Differences", new JLabel("Not yet implemented."));
     }
 
     private void applyNamespacesToSubcomponents() {
@@ -83,6 +94,8 @@ public class SynchronizationComponent extends AbstractGUIComponent {
             log().debug("Setting namespace for: " + component);
             component.setMasterNamespaceID(this.settings.getMasterNamespace());
             component.setReferringNamespaceID(this.settings.getReferringNamespace());
+            component.setIgnoredTermsFile(excludedTermsFile);
+            component.setIgnoredTerms(excludedTerms);
         }
     }
 
@@ -91,6 +104,25 @@ public class SynchronizationComponent extends AbstractGUIComponent {
             component.refreshView();
         }
     } 
+    
+    private void loadExcludedTerms() {
+        if (this.excludedTermsFile != null) {
+            try {
+                this.excludedTerms.clear();
+                final BufferedReader reader = new BufferedReader(new FileReader(this.excludedTermsFile));
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    final String termID = line.split("\\t")[0].trim();
+                    final OBOClass term = (OBOClass)(SessionManager.getManager().getSession().getObject(termID));
+                    this.excludedTerms.add(term);
+                }
+            } catch (FileNotFoundException e) {
+                log().error("Failed to read excluded terms file", e);
+            } catch (IOException e) {
+                log().error("Failed to read excluded terms file", e);
+            }
+        }
+    }
 
     private Logger log() {
         return Logger.getLogger(this.getClass());
